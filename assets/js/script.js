@@ -57,6 +57,7 @@ function onClickAddButton (){
 var taskList = document.getElementById("taskList");
 var deleteButton = document.getElementById("deleteButton");
 
+// Delete function
 function onClickDeleteButton() {
     var tasks = taskList.getElementsByTagName("li");
     // We go backwards so we can safely remove elements while iterating
@@ -75,3 +76,25 @@ function onClickDeleteButton() {
 
 addButton.addEventListener("click", onClickAddButton);
 deleteButton.addEventListener("click", onClickDeleteButton);
+
+//Edit and Save function
+
+var editButton  = document.getElementById('editButton');
+
+    
+function onClickEditButton(){
+    var lis  = taskList.querySelectorAll('li');
+    lis.forEach(function(li){
+        li.toggleAttribute('contenteditable');
+    });
+
+    if( lis[0].hasAttribute('contenteditable') ){
+        // Currently editing, change the button
+        editButton.innerText = 'Click here to Save';
+    } else {
+        // We just "saved". run "save functions" here
+        editButton.innerText = 'Click here to Edit';
+    }
+}
+
+editButton.addEventListener('click', onClickEditButton);
