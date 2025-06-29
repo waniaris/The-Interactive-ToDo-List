@@ -31,47 +31,35 @@ function onClickAddButton (){
         return;
     }
 
-// Add new task with checkbox
-    var li = document.createElement("li");
-
-    var checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = taskInputValue;
-
-    var label = document.createElement("label");
-    label.textContent = taskInputValue;
-    label.style.marginLeft = "8px";
-
-    li.appendChild(checkbox);
-    li.appendChild(label);
-    taskList.appendChild(li);
-
-    newTaskInput.value = "";
+    // if all valid:
+    var newTaskE1 = document.createElement("li"); // display the task in the task list.
+    newTaskE1.textContent = taskInputValue.trim(); // Sets the content of the new list item to whatever the user typed
+    taskList.appendChild(newTaskE1); // Adds the new <li> to the task list (<ul> element 
+    newTaskInput.value = ""; // clear input after adding
     errorMsg.style.display = "none";
 
-    deleteMsg.textContent = "Tick checkbox to delete a task.";
+    deleteMsg.textContent = "Task added successfully.";
+    deleteMsg.style.color = "green";
     deleteMsg.style.display = "block";
-    deleteButton.style.display = "block";
+ 
 }
 
+addButton.addEventListener("click", onClickAddButton);
+deleteMsg.style.display = "block";
+
+// Delete Task
 var taskList = document.getElementById("taskList");
 var deleteButton = document.getElementById("deleteButton");
 
 function onClickDeleteButton() {
-    var tasks = taskList.getElementsByTagName("li");
-    // We go backwards so we can safely remove elements while iterating
-    for (var i = tasks.length - 1; i >= 0; i--) {
-        var checkbox = tasks[i].querySelector("input[type='checkbox']");
-        if (checkbox && checkbox.checked) {
-            taskList.removeChild(tasks[i]);
-        }
+  var taskList = document.taskList[0];
+  var txt = "";
+  var i;
+  for (i = 0; i < taskList.length; i++) {
+    if (taskList[i].checked) {
+      txt = txt + taskList[i].value + " ";
     }
-    // Hide delete message and delete button if list is empty
-    if (taskList.children.length === 0) {
-        deleteMsg.style.display = "none";
-        deleteButton.style.display = "none";
-    }
+  }
+  document.getElementById("taskDelete").value = "To delete: " + txt;
 }
 
-addButton.addEventListener("click", onClickAddButton);
-deleteButton.addEventListener("click", onClickDeleteButton);
