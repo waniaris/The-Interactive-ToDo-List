@@ -87,9 +87,10 @@ function onClickAddButton() {
   });
 
   // Delete button handler
-  deleteBtn.addEventListener("click", function () {
-    li.remove();
-    updateMoveButtons();
+  deleteBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to delete this task?")) {
+      li.remove();
+    }
   });
 
   // Move up handler
