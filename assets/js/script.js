@@ -1,100 +1,130 @@
-var newTaskInput = document.getElementById("newTask");
-var addButton = document.getElementById("addButton");
-var errorMsg = document.getElementById("errorMsg");
-var deleteMsg = document.getElementById("deleteMsg");
+const newTaskInput = document.getElementById("newTask");
+const addButton = document.getElementById("addButton");
+const errorMsg = document.getElementById("errorMsg");
+const taskList = document.getElementById("taskList");
 
-// Use `addEventListener()` to attach the click event handler to the button.
+function updateMoveButtons() {
+  const tasks = taskList.children;
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i];
+    const upBtn = task.querySelector(".move-up");
+    const downBtn = task.querySelector(".move-down");
 
-function onClickAddButton (){
-    var taskInputValue = newTaskInput.value.trim();
+    // Enable both buttons by default
+    upBtn.disabled = false;
+    downBtn.disabled = false;
 
-    // check if input is empty
-    if (taskInputValue === ""){
-        errorMsg.textContent = "Oopps, empty input. Please type in a task.";
-        errorMsg.style.display = "block";
-        return;
+    // Disable up button for first task
+    if (i === 0) {
+      upBtn.disabled = true;
     }
-
-    // check if input is duplicate
-    var isDuplicate = false;
-    var existingInput = document.getElementsByTagName("li");
-
-    for (var i = 0; i < existingInput.length; i++) {
-        if (existingInput[i].textContent === taskInputValue) {
-            isDuplicate = true;
-            break;
-        }
+    // Disable down button for last task
+    if (i === tasks.length - 1) {
+      downBtn.disabled = true;
     }
-    if (isDuplicate) {
-        errorMsg.textContent = "This task already exists. Please review your input and check task list.";
-        errorMsg.style.display = "block";
-        return;
-    }
-
-// Add new task with checkbox
-    var li = document.createElement("li");
-
-    var checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = taskInputValue;
-
-    var label = document.createElement("label");
-    label.textContent = taskInputValue;
-    label.style.marginLeft = "8px";
-
-    li.appendChild(checkbox);
-    li.appendChild(label);
-    taskList.appendChild(li);
-
-    newTaskInput.value = "";
-    errorMsg.style.display = "none";
-
-    deleteMsg.textContent = "Tick checkbox to delete a task.";
-    deleteMsg.style.display = "block";
-    deleteButton.style.display = "block";
+  }
 }
 
-var taskList = document.getElementById("taskList");
-var deleteButton = document.getElementById("deleteButton");
+function onClickAddButton() {
+  let taskInputValue = newTaskInput.value.trim();
+  errorMsg.style.display = "none";
 
-// Delete function
-function onClickDeleteButton() {
-    var tasks = taskList.getElementsByTagName("li");
-    // We go backwards so we can safely remove elements while iterating
-    for (var i = tasks.length - 1; i >= 0; i--) {
-        var checkbox = tasks[i].querySelector("input[type='checkbox']");
-        if (checkbox && checkbox.checked) {
-            taskList.removeChild(tasks[i]);
-        }
+  if (taskInputValue === "") {
+    errorMsg.textContent = "Oops, empty input. Please type in a task.";
+    errorMsg.style.display = "block";
+    return;
+  }
+
+  // Check for duplicates
+  let existingTasks = document.querySelectorAll("#taskList li label");
+  for (let i = 0; i < existingTasks.length; i++) {
+    if (existingTasks[i].textContent === taskInputValue) {
+      errorMsg.textContent = "This task already exists.";
+      errorMsg.style.display = "block";
+      return;
     }
-    // Hide delete message and delete button if list is empty
-    if (taskList.children.length === 0) {
-        deleteMsg.style.display = "none";
-        deleteButton.style.display = "none";
+  }
+
+  let li = document.createElement("li");
+  li.className = "d-flex align-items-center mb-2";
+
+  let label = document.createElement("label");
+  label.textContent = taskInputValue;
+  label.className = "flex-grow-1 ms-2";
+
+  let editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.className = "btn btn-sm btn-outline-secondary ms-2";
+
+  let deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.className = "btn btn-sm btn-outline-danger ms-1";
+
+  let upBtn = document.createElement("button");
+  upBtn.textContent = "↑";
+  upBtn.className = "btn btn-sm btn-outline-primary me-1 move-up";
+  upBtn.title = "Move task up to increase priority";
+
+  let downBtn = document.createElement("button");
+  downBtn.textContent = "↓";
+  downBtn.className = "btn btn-sm btn-outline-primary move-down";
+  downBtn.title = "Move task down to decrease priority";
+
+  // Edit button handler
+  let editing = false;
+  editBtn.addEventListener("click", function () {
+    if (!editing) {
+      label.setAttribute("contenteditable", "true");
+      label.style.backgroundColor = "#fff3cd";
+      label.focus();
+      editBtn.textContent = "Save";
+    } else {
+      label.removeAttribute("contenteditable");
+      label.style.backgroundColor = "transparent";
+      editBtn.textContent = "Edit";
     }
+    editing = !editing;
+  });
+
+  // Delete button handler
+  deleteBtn.addEventListener("click", function () {
+    li.remove();
+    updateMoveButtons();
+  });
+
+  // Move up handler
+  upBtn.addEventListener("click", function () {
+    let prev = li.previousElementSibling;
+    if (prev !== null) {
+      taskList.insertBefore(li, prev);
+      updateMoveButtons();
+    }
+  });
+
+  // Move down handler
+  downBtn.addEventListener("click", function () {
+    let next = li.nextElementSibling;
+    if (next !== null) {
+      taskList.insertBefore(next, li);
+      updateMoveButtons();
+    }
+  });
+
+  // Append buttons and label to li
+  li.appendChild(upBtn);
+  li.appendChild(downBtn);
+  li.appendChild(label);
+  li.appendChild(editBtn);
+  li.appendChild(deleteBtn);
+
+  // Add the li to the list
+  taskList.appendChild(li);
+
+  // Clear input field
+  newTaskInput.value = "";
+
+  // Update move buttons states
+  updateMoveButtons();
 }
 
 addButton.addEventListener("click", onClickAddButton);
-deleteButton.addEventListener("click", onClickDeleteButton);
-
-//Edit and Save function
-
-var editButton  = document.getElementById('editButton');
-
-    
-function onClickEditButton(){
-    var lis  = taskList.querySelectorAll('li');
-    lis.forEach(function(li){
-        li.toggleAttribute('contenteditable');
-    });
-
-    if( lis[0].hasAttribute('contenteditable') ){
-        // Currently editing, change the button
-        editButton.innerText = 'Click here to Save';
-    } else {
-        // We just "saved". run "save functions" here
-        editButton.innerText = 'Click here to Edit';
-    }
-}
-
-editButton.addEventListener('click', onClickEditButton);

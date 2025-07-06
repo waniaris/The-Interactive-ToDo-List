@@ -1,65 +1,67 @@
-var newTaskInput = document.getElementById("newTask");
-var addButton = document.getElementById("addButton");
-var errorMsg = document.getElementById("errorMsg");
-var deleteMsg = document.getElementById("deleteMsg");
+const newTaskInput = document.getElementById("newTask");
+const addButton = document.getElementById("addButton");
+const errorMsg = document.getElementById("errorMsg");
+const taskList = document.getElementById("taskList");
 
-// Use `addEventListener()` to attach the click event handler to the button.
+function onClickAddButton() {
+  const taskInputValue = newTaskInput.value.trim();
+  errorMsg.style.display = "none";
 
-function onClickAddButton (){
-    var taskInputValue = newTaskInput.value.trim();
+  if (taskInputValue === "") {
+    errorMsg.textContent = "Oops, empty input. Please type in a task.";
+    errorMsg.style.display = "block";
+    return;
+  }
 
-    // check if input is empty
-    if (taskInputValue === ""){
-        errorMsg.textContent = "Oopps, empty input. Please type in a task.";
-        errorMsg.style.display = "block";
-        return;
+  const existingTasks = document.querySelectorAll("#taskList li label");
+  for (const lbl of existingTasks) {
+    if (lbl.textContent === taskInputValue) {
+      errorMsg.textContent = "This task already exists.";
+      errorMsg.style.display = "block";
+      return;
     }
+  }
 
-    // check if input is duplicate
-    var isDuplicate = false;
-    var existingInput = document.getElementsByTagName("li");
+  const li = document.createElement("li");
+  li.className = "d-flex align-items-center mb-2";
 
-    for (var i = 0; i < existingInput.length; i++) {
-        if (existingInput[i].textContent === taskInputValue) {
-            isDuplicate = true;
-            break;
-        }
+  const label = document.createElement("label");
+  label.textContent = taskInputValue;
+  label.className = "flex-grow-1 ms-2";
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.className = "btn btn-sm btn-outline-secondary ms-2";
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.className = "btn btn-sm btn-outline-danger ms-1";
+
+  li.appendChild(label);
+  li.appendChild(editBtn);
+  li.appendChild(deleteBtn);
+  taskList.appendChild(li);
+
+  let editing = false;
+  editBtn.addEventListener("click", () => {
+    if (!editing) {
+      label.setAttribute("contenteditable", "true");
+      label.style.backgroundColor = "#fff3cd";
+      label.focus();
+      editBtn.textContent = "Save";
+    } else {
+      label.removeAttribute("contenteditable");
+      label.style.backgroundColor = "transparent";
+      editBtn.textContent = "Edit";
     }
-    if (isDuplicate) {
-        errorMsg.textContent = "This task already exists. Please review your input and check task list.";
-        errorMsg.style.display = "block";
-        return;
-    }
+    editing = !editing;
+  });
 
-    // if all valid:
-    var newTaskE1 = document.createElement("li"); // display the task in the task list.
-    newTaskE1.textContent = taskInputValue.trim(); // Sets the content of the new list item to whatever the user typed
-    taskList.appendChild(newTaskE1); // Adds the new <li> to the task list (<ul> element 
-    newTaskInput.value = ""; // clear input after adding
-    errorMsg.style.display = "none";
+  deleteBtn.addEventListener("click", () => {
+    li.remove();
+  });
 
-    deleteMsg.textContent = "Task added successfully.";
-    deleteMsg.style.color = "green";
-    deleteMsg.style.display = "block";
- 
+  newTaskInput.value = "";
 }
 
 addButton.addEventListener("click", onClickAddButton);
-deleteMsg.style.display = "block";
-
-// Delete Task
-var taskList = document.getElementById("taskList");
-var deleteButton = document.getElementById("deleteButton");
-
-function onClickDeleteButton() {
-  var taskList = document.taskList[0];
-  var txt = "";
-  var i;
-  for (i = 0; i < taskList.length; i++) {
-    if (taskList[i].checked) {
-      txt = txt + taskList[i].value + " ";
-    }
-  }
-  document.getElementById("taskDelete").value = "To delete: " + txt;
-}
-
